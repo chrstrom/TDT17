@@ -1,0 +1,4 @@
+natsort
+opencv-python
+#mim install mmcv-full==1.4.2   NOTE! Uses mim adn not pip!! See mmdetect install for more info
+ensemble_boxes

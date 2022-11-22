@@ -1,8 +1,11 @@
 # from https://github.com/daitranskku/CRDDC_2022_Code/blob/main/mmdet_based/configs/vfnet_train_all.py
+# Usage: python .\mmdetection\tools\train.py .\train_cfg.py
 
 _base_ = [
-    './mmdetection/configs/_base_/datasets/coco_detection.py',
-    './mmdetection/configs/_base_/schedules/schedule_1x.py', './mmdetection/configs/_base_/default_runtime.py'
+    #'./mmdetection/configs/_base_/datasets/coco_detection.py',
+    #'./mmdetection/configs/_base_/schedules/schedule_1x.py',
+    #'./mmdetection/configs/_base_/default_runtime.py',
+    './mmdetection/configs/vfnet/vfnet_r50_fpn_mstrain_2x_coco.py', # Have to use this to match exactly with the ResNeXt pretrained!
 ]
 dataset_type = 'CocoDataset'
 classes = ('D00','D10','D20','D40')
@@ -10,7 +13,6 @@ num_classes = 4
 
 # model settings
 model = dict(
-    type='VFNet',
     backbone=dict(
         type='ResNeXt',
         depth=101,
@@ -22,10 +24,8 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, True, True, True),
         init_cfg=dict(
-            type='Pretrained', checkpoint='open-mmlab://resnext101_64x4d')),
+            type='Pretrained', checkpoint='open-mmlab://resnext101_64x4d')), # From https://github.com/open-mmlab/mmdetection/blob/master/configs/vfnet/vfnet_x101_64x4d_fpn_mstrain_2x_coco.py
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -68,8 +68,8 @@ model = dict(
         max_per_img=100))
 
 # data setting
-dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+# dataset_type = 'CocoDataset'
+# data_root = 'data/coco/'
 
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
@@ -108,7 +108,7 @@ test_pipeline = [
 
 data = dict(
     samples_per_gpu=10,
-    workers_per_gpu=40,
+    workers_per_gpu=8,
     train=dict(
         type='ConcatDataset',
         pipeline=train_pipeline,

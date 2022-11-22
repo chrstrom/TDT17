@@ -38,7 +38,7 @@ test_pipeline = [
 ]
 data = dict(
     samples_per_gpu=10,
-    workers_per_gpu=40,
+    workers_per_gpu=8,
     train=dict(
         type='ConcatDataset',
         ann_file='data/coco/annotations/instances_train2017.json',
@@ -121,7 +121,7 @@ data = dict(
                         std=[58.395, 57.12, 57.375],
                         to_rgb=True),
                     dict(type='Pad', size_divisor=32),
-                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='DefaultFormatBundle'),
                     dict(type='Collect', keys=['img'])
                 ])
         ]))
@@ -151,25 +151,21 @@ workflow = [('train', 1)]
 opencv_num_threads = 0
 mp_start_method = 'fork'
 auto_scale_lr = dict(enable=False, base_batch_size=16)
-classes = ('D00', 'D10', 'D20', 'D40')
-num_classes = 4
 model = dict(
     type='VFNet',
     backbone=dict(
         type='ResNeXt',
         depth=101,
-        groups=64,
-        base_width=4,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, True, True, True),
         init_cfg=dict(
-            type='Pretrained', checkpoint='open-mmlab://resnext101_64x4d')),
+            type='Pretrained', checkpoint='open-mmlab://resnext101_64x4d'),
+        groups=64,
+        base_width=4),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -209,6 +205,8 @@ model = dict(
         score_thr=0.05,
         nms=dict(type='nms', iou_threshold=0.6),
         max_per_img=100))
+classes = ('D00', 'D10', 'D20', 'D40')
+num_classes = 4
 work_dir = './work_dirs/india_vfnet_resnet101_train_all_aug'
 auto_resume = False
 gpu_ids = [0]
