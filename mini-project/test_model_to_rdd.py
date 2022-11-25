@@ -27,7 +27,7 @@ for filename in tqdm(glob.glob(path)):
 
         prediction_string += f"{object_class} {xmin} {ymin} {xmax} {ymax} "
 
-    submission_string = image_id + ", " + prediction_string 
+    submission_string = image_id + "," + prediction_string 
 
     predictions.append(submission_string)
 
